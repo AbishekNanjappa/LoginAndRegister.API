@@ -5,8 +5,6 @@ namespace LoginAndRegister.API.Models
 {
     public class SystemUser : IdentityUser
     {
-        [Key]
-        public override string Id { get; set; } = Guid.NewGuid().ToString();
         [Required]
         public required string Name { get; set; }
         [Required]
