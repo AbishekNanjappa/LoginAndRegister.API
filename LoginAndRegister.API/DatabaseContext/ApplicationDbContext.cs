@@ -1,19 +1,16 @@
 ﻿using LoginAndRegister.API.Models;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace LoginAndRegister.API.DatabaseContext
 {
-    public class ApplicationDbContext: Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityDbContext<SystemUser, 
-        IdentityRole, string>
+    public class ApplicationDbContext : IdentityDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        public ApplicationDbContext(DbContextOptions options): base(options)
         {
+
         }
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
-        }
+        public DbSet<SystemUser> SystemUsers { get; set; }
     }
 }
