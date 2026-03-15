@@ -18,6 +18,7 @@ namespace LoginAndRegister.Service.Services
 
         public string GenerateJwtToken()
         {
+
             //User has provided valid login credentials, JWT token is created and returned from here
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
