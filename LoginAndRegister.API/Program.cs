@@ -1,5 +1,8 @@
 using LoginAndRegister.API.DatabaseContext;
 using LoginAndRegister.API.Models;
+using LoginAndRegister.Service.Services;
+using LoginAndRegister.Service.Services.Interfaces;
+using LoginAndRegister.Service.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +43,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"])),
         };
     });
+
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
+builder.Services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
 
 var app = builder.Build();
 

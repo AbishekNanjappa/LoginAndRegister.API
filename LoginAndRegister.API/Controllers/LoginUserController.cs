@@ -1,12 +1,8 @@
-﻿using LoginAndRegister.API.DatabaseContext;
-using LoginAndRegister.API.Models;
+﻿using LoginAndRegister.API.Models;
 using LoginAndRegister.API.Models.DTOs;
-using Microsoft.AspNetCore.Http;
+using LoginAndRegister.Service.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 
 namespace LoginAndRegister.API.Controllers
 {
@@ -15,22 +11,19 @@ namespace LoginAndRegister.API.Controllers
     public class LoginUserController : ControllerBase
     {
         private readonly ILogger<LoginUserController> _logger;
-        private readonly ApplicationDbContext _dbContext;
         private readonly UserManager<SystemUser> _userManager;
         private readonly SignInManager<SystemUser> _signInManager;
-        private readonly IConfiguration _configuration;
+        private readonly ITokenGeneratorService _tokenGeneratorService;
 
         public LoginUserController(ILogger<LoginUserController> logger,
-            ApplicationDbContext dbContext,
             UserManager<SystemUser> userManager,
             SignInManager<SystemUser> signInManager,
-            IConfiguration configuration)
+            ITokenGeneratorService tokenGeneratorService)
         {
             _logger = logger;
-            _dbContext = dbContext;
             _userManager = userManager;
             _signInManager = signInManager;
-            _configuration = configuration;
+            _tokenGeneratorService = tokenGeneratorService;
         }
 
         [HttpPost("StandardUser")]
@@ -57,19 +50,8 @@ namespace LoginAndRegister.API.Controllers
                 _logger.LogError("Sign-In attempt failed. Please check entered credentials.");
                 return NotFound("User not found.");
             }
-
-            //User has provided valid login credentials, JWT token is created and returned from here
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var jwtToken = new JwtSecurityToken(issuer :_configuration["JWT:Issuer"],
-                audience: _configuration["Audience"],
-                claims: null,
-                expires: DateTime.Now.AddMinutes(30),
-                signingCredentials: credentials
-                );
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+            var tokenString = _tokenGeneratorService.GenerateJwtToken();
             return StatusCode(StatusCodes.Status200OK, new { token = tokenString});
         }
     }
 }
- 
